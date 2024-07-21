@@ -1,0 +1,8 @@
+pandas == 2.2.2
+numpy == 1.23.5
+nltk == 3.8.1
+requests == 2.32.3
+scikit-learn == 1.5.0
+urllib3 == 2.2.1
+# es-core-news-sm == 3.7.0
+matplotlib == 3.9.1
