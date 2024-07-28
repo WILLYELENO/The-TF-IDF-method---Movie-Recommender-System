@@ -3,12 +3,15 @@ import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 
-"""Librería para trabajar con dataframe"""
+"""Librería para trabajar con dataframe nuestra db de películas"""
 import pandas as pd
 
 """Librerías y métodos para vectorizar y obtener distancia euclidiana y similitud del coseno """
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
+
+"""Funciones"""
+import functions
 
 
 #Leemos el archivo csv y lo convertimos en un dataframe
@@ -39,18 +42,46 @@ print("ROW",row)
 
 """
 Ya tenemos nuestra columna hecha y podremos convertir esto en una vectorizacion del tipo TF e IDF.
-(VER CALCULOS DE EL EPISODIO 0)
+
+- TF: Se calcula como el número de veces que aparece una palabra en un documento, dividido por el total de palabras de ese doc.
+Aquí cada texto será un documento.
+
+- IDF: Logaritmo del total de documentos dividido por el número de documentos que contienen la palabra
+
+- TF-IDF: Se calcula multiplicando dos componentes: TF e IDF
+
 Para representarlas,haremos una funcion...
 """
 
 tfidf = TfidfVectorizer(max_features=2000) #max_features = CANTIDAD MAXIMA DE TOKEN (NO DEBE HABER UNA PELI PARA MAS DE 2000 TOKEN. Esto lo averiguamos con print(df['texto'].iloc[0]) )
 
 # 1)Vectorizamos
-#Creamos nuestra matriz de vectores sobre la columna texto
+#Creamos nuestra matriz de vectores de características TF-IDF sobre la columna texto.
 X = tfidf.fit_transform(df['texto'])
 print(X)
 
-"""Nuestra matriz es de 5043 x 2000, si le poniamos mas en el max_features teniamos una matriz mas grande"""
+#Utilizamos nuestra funcion para generar un mapeo del total de vocabulario creado en la variable 'tfidf' con los valores idf
+idf_dict = functions.get_map_vocabulary_and_idfVaules(tfidf)
+
+# Imprimir el diccionario
+# for term, idf in list(idf_dict.items())[:10]:  # Imprime los primeros 10 términos y sus IDF
+#     print(f"{term}: {idf}")
+
+"""
+La variable tfidf.idf_ contiene los valores de IDF (Inverse Document Frequency) para cada término en el vocabulario del 
+modelo TfidfVectorizer que cree.
+Nuestra matriz es de 5043 x 2000, si le poniamos mas en el max_features teniamos una matriz mas grande
+
+El array tiene una longitud de 2000, lo que indica que el TfidfVectorizer ha creado un vocabulario con 2000 términos. si le poniamos 
+mas en el max_features teniamos una matriz mas grande
+
+
+Los valores en tfidf.idf_ reflejan la importancia de cada término en el vocabulario de las películas en función de su presencia en el corpus.
+
+Valores más altos indican que el término es menos frecuente en el corpus, por lo tanto, es más distintivo.
+Valores más bajos indican que el término aparece en muchos documentos, por lo que tiene menos poder discriminativo.
+
+"""
 
 # 2) Generamos un mapeo de las películas
 
@@ -71,7 +102,10 @@ print ("Indice:",indice)
 
 
 """
-Ahora haremos una consulta y averiguaremos su vector. Nos dirá que es un vector de 2000 dimensiones
+Ahora haremos una consulta y averiguaremos su vector. Nos dirá que es un vector de  2000 dimensiones (1 fila, 2000 columnas)
+No deja de ser una matriz dispersa, es decir que contiene principalmente muchos ceros.
+
+Esta variable contendrá los valores TF-IDF para la película que la hemos asignado a la variable índice.
 """
 
 consulta = X[indice]
@@ -84,6 +118,19 @@ Por ello, para mostrar el vector completo (la mayoria seran 0) lo convertimos en
 
 print (consulta.toarray())
 #[[0. 0. 0. ... 0. 0. 0.]]
+
+
+"""Tambien podemos ver en 'consulta.indices' los indices de las columnas donde los valores no son nulos
+
+A su vez con 'consulta.data' podemos ver los valores TF-IDF correspondientes a los índices.
+Es decir, si en la posición de 'consulta.indices' tenemos un valor de 0.15 en 'consulta.data', quiere decir que la 
+posicion 32, tiene una importancia TF-IDF de 0.15 para la pelicula indicada. En otras palabras, tiene un valor especifico
+que indica la importancia de esos términos en el contexto de la película guardada en la variable 'indice'
+"""
+
+# Llamar a la función para obtener términos y valores TF-IDF
+term_values = functions.get_terms_from_vector(consulta, tfidf)
+
 
 """ Ahora vamos a calcular la similitud del coseno sobre la consulta (es el indice  de la pelicula 'The Dark Knight Rises' ) y el vector 'X' 
 que es el vector con todas nuestras peliculas..."""
