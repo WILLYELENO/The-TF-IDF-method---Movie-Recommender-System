@@ -15,7 +15,7 @@ Este proyecto proporciona herramientas para analizar y graficar similitudes entr
 - `scikit-learn`
 - `matplotlib`
 
-Instala los requisitos utilizando pip:
+Instalamos los requisitos utilizando pip:
 
 ```bash
 pip install pandas scikit-learn matplotlib
