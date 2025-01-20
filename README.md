@@ -88,7 +88,6 @@ idf_dict = functions.get_map_vocabulary_and_idfVaules(tfidf)
 term_values = functions.get_terms_from_vector(consulta, tfidf)
 
 
-¡Claro! Aquí tienes un archivo README.md completo que incluye todo el contenido, diseñado para proporcionar una visión completa de tu proyecto y sus características:
 
 markdown
 Copiar código
